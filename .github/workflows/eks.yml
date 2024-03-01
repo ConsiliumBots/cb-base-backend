@@ -1,0 +1,114 @@
+name: Deploy to Amazon EKS
+on:
+  push:
+    branches: [ staging, master ]
+  workflow_dispatch:
+
+env:
+  ECR_REGISTRY: 037742176437.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REPOSITORY: cb_<project>_staging
+  AWS_REGION: us-east-1
+  RELEASE_REVISION: ${{ github.sha }}
+  KUBE_NAMESPACE: dummy
+  DEPLOYMENT_NAME: deployment-<project>
+  CONTAINER_APP_NAME: backend-<project>
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  deploy-eks:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.8 ]
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.4.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Set env to staging
+        if: endsWith(github.ref, '/staging')
+        run: |
+          echo "cb_env=staging" >> $GITHUB_ENV
+          echo "KUBE_NAMESPACE=cb-backends" >> $GITHUB_ENV
+          echo "KUBE_CONFIG_DATA=${{ secrets.KUBE_CONFIG_DATA_STAGING }}" >> $GITHUB_ENV
+          echo "$SECRET_CONF" > /tmp/mysecrets.txt
+        shell: bash
+        env:
+          SECRET_CONF : ${{secrets.STAGING_SECRET_CONF}}
+
+      - name: Set env to production
+        if: endsWith(github.ref, '/master')
+        run: |
+          echo "cb_env=production" >> $GITHUB_ENV
+          echo "KUBE_NAMESPACE=cb-backends" >> $GITHUB_ENV
+          echo "KUBE_CONFIG_DATA=${{ secrets.KUBE_CONFIG_DATA_PROD }}" >> $GITHUB_ENV
+          echo "ECR_REPOSITORY=cb_<project>_production" >> $GITHUB_ENV
+          echo "$SECRET_CONF" > /tmp/mysecrets.txt
+        shell: bash
+        env:
+          SECRET_CONF : ${{secrets.PROD_SECRET_CONF}}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@master
+
+      - name: Docker cache layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-single-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-single-buildx
+      - name: Slack notification Buildx
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_TITLE: 'Deployment Buildx :ok_hand:'
+          SLACK_MESSAGE: "Everything looks good on Code project ${{github.repository}} :ok_hand: \n Begining the building and push \n Iniciated by ${{github.actor}}"
+      - name: Build & Push Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          RELEASE_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.RELEASE_REVISION }}
+          RELEASE_IMAGE_LATEST: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+          ENVIRONMENT: ${{ env.cb_env }}
+        run: |
+          echo "ENVIRONMENT is ${{ env.cb_env }}"
+          docker buildx create --use
+          docker buildx build --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache-new --build-arg INPUT_ENVIRONMENT=${ENVIRONMENT} --secret id=mysecret,src=/tmp/mysecrets.txt -t ${{ env.RELEASE_IMAGE }} -t ${{ env.RELEASE_IMAGE_LATEST }} --push .
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Deploy to Kubernetes cluster
+        uses: ConsiliumBots/kubectl-aws-eks@master
+        env:
+          RELEASE_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.RELEASE_REVISION }}
+        with:
+          args: set image deployment/${{ env.DEPLOYMENT_NAME }} ${{ env.CONTAINER_APP_NAME }}=${{ env.RELEASE_IMAGE }} -n ${{ env.KUBE_NAMESPACE }}
+
+      - name: Verify Kubernetes deployment
+        uses: ConsiliumBots/kubectl-aws-eks@master
+        with:
+          args: rollout status deployment ${{ env.DEPLOYMENT_NAME }} -n ${{ env.KUBE_NAMESPACE }}

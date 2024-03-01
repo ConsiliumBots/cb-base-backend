@@ -1,0 +1,36 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+certifi = "==2021.10.8"
+django-cors-headers = "==3.8.0"
+django-rest-framework = "==0.1.0"
+djangorestframework = "==3.12.4"
+djangorestframework-simplejwt = "==4.8.0"
+pandas = "==1.2.3"
+psycopg2-binary = "==2.8.6"
+requests = "==2.25.1"
+drf-yasg = "*"
+Django = "==4.0.4"
+Pillow = "==8.1.1"
+Werkzeug = "==1.0.1"
+uwsgi = "==2.0.18"
+sentry-sdk = "*"
+django-slack = "*"
+boto3 = "*"
+schedule = "*"
+xlrd = "*"
+openpyxl = "*"
+twilio = "*"
+openai = "*"
+factory-boy = "*"
+pinecone-client = "*"
+numpy = "==1.24.3"
+fuzzywuzzy = "*"
+unidecode="*"
+[dev-packages]
+
+[requires]
+python_version = "3.8"
