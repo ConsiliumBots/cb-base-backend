@@ -7,7 +7,7 @@ from app.permissions import IsSuperUser
 class UserViewSet(BaseViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    http_method_names = ["get"]
+    http_method_names = ["get", "post", "patch", "delete"]
     permission_classes = [IsSuperUser]  # only super users can access
 
     def get_queryset(self):

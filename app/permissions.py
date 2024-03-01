@@ -3,7 +3,6 @@ from app.models import User
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from base.permissions import request_to_user
-from app.models import Role, UserRole
 
 
 class IsAuthenticated(permissions.BasePermission):

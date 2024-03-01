@@ -22,8 +22,8 @@ class PostTestCase(TestCase):
         """
 
         # create two users
-        self.user_A = UserFactory()
-        self.user_B = UserFactory()
+        self.user_A = UserFactory(username="user_A")
+        self.user_B = UserFactory(username="user_B")
 
         # get user tokens
         self.user_A_token = login(self.user_A)

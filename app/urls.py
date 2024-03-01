@@ -2,7 +2,6 @@
 from django.urls import path, re_path
 from app.viewsets import *
 from app.views import healthcheck, login
-from base.utils import healthcheck
 from rest_framework.routers import DefaultRouter
 
 # swagger (documentation)
@@ -23,10 +22,6 @@ schema_view = get_schema_view(
     permission_classes=[permissions.AllowAny],
 )
 # end swagger
-
-###############################
-# import viewsets dynamically #
-###############################
 router = DefaultRouter()
 router.register('post', PostViewSet, basename="post")
 router.register('user', UserViewSet, basename="user")

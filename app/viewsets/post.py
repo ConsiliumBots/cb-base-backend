@@ -8,7 +8,7 @@ from rest_framework.exceptions import PermissionDenied
 class PostViewSet(BaseViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    http_method_names = ["get"]
+    http_method_names = ["get", "post", "patch", "delete"]
     permission_classes = [IsAuthenticated]  # only super users can access
 
     def get_queryset(self):

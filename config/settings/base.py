@@ -58,15 +58,16 @@ try:
     _secrets = get_secret_value_response
 except ClientError as e:
     _secrets = dict()
+for key in _secrets:
+    print("Secret read:", key)
 # get secrets
 file_name = "secrets.json"
 path_name = os.path.join(BASE_DIR, "settings", file_name)
 if os.path.exists(path_name):
-    with open() as f:
+    with open(path_name) as f:
         overlap_secrets = json.loads(f.read())
         for key in overlap_secrets:
             _secrets[key] = overlap_secrets[key]
-print("secrets?", _secrets)
 
 
 def get_secret(setting, secrets=_secrets):

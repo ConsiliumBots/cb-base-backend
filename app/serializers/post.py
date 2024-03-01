@@ -7,4 +7,4 @@ class PostSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Post
         # use 'fields = "__all__"' if all fields needed
-        fields = ["content"]
+        fields = ["content", "user"]

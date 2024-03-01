@@ -14,6 +14,8 @@ Repositorio base de backend para ConsiliumBots, con un par de modelos de ejemplo
 
 Es necesario hacer unos cambios al proyecto para poder utilizarlo. Cosas a necesarias a cambiar:
 - Cambiar cada instancia de <project> al nombre del projecto. Por ejemplo, <project> -> project.
+- Eliminar la carpeta .git y crear nuevo proyecto con `git init`. Setear upstream a `cb-<project>-back`.
+- Agregar el archivo `secrets.json` con las siguientes llaves: `DB_HOST`, `DB_NAME`, `DB_PASSWORD`, `DB_PORT`, `DB_USERNAME`, `EMAIL_HOST`, `EMAIL_HOST_PASSWORD`, `EMAIL_HOST_USER`, `EMAIL_PORT`.
 
 ### 2. Instalación librerías
 
@@ -22,6 +24,7 @@ Es necesario instalar librerías de requirements.txt. Se puede hacer con `pip in
 ### 3. Pasos admin
 Es necesario que un administrador haga un par de pasos:
 - Generación de ECR en AWS
+- Generación de bases de datos
 - Generación de dos secretos en AWS, `<project>/staging` y `<project>/production`.
 - Aplicación de deployments
 
@@ -40,3 +43,12 @@ Una vez que está todo lo anterior listo, hay que conectar con la base de datos.
 - tests: tests.
 - factories: creadores de objetos.
 - migration
+
+## Testing
+
+para correr tests, correr `python manage.py test`
+Para correr solo uno, correr `python manage.py test app.testname`
+
+## Documentación
+
+Una vez que el servidor está corriendo, uno puede encontrar la documentación en: http://127.0.0.1:8000/documentation/
