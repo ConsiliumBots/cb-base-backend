@@ -14,12 +14,10 @@ import datetime
 import json
 import os
 import sys
-import sentry_sdk
 import boto3
 from botocore.exceptions import ClientError
 from corsheaders.defaults import default_headers
 from django.core.exceptions import ImproperlyConfigured
-from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
