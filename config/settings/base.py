@@ -70,7 +70,7 @@ if os.path.exists(path_name):
             pass
 
 
-def get_secret(setting, secrets=_secrets):
+def get_secret(setting, default=None, secrets=_secrets):
     """Get the secret variable or return ImproperlyConfigured."""
     try:
         return secrets[setting]
@@ -78,7 +78,8 @@ def get_secret(setting, secrets=_secrets):
         error_msg = "Set the {0} variable on secrets.json file or environment.".format(
             setting
         )
-        raise ImproperlyConfigured(error_msg)
+        print(error_msg)
+        return default
 
 
 # Quick-start development settings - unsuitable for production
