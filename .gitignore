@@ -24,6 +24,7 @@ htmlcov/
 *.csv
 *.mo
 *.txt
+!requirements.txt
 venv/
 .DS_Store
 tests_students

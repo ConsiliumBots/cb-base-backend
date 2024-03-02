@@ -14,7 +14,6 @@ import datetime
 import json
 import os
 import sys
-import openai
 import sentry_sdk
 import boto3
 from botocore.exceptions import ClientError
