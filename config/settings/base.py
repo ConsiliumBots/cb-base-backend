@@ -62,9 +62,12 @@ file_name = "secrets.json"
 path_name = os.path.join(BASE_DIR, "settings", file_name)
 if os.path.exists(path_name):
     with open(path_name) as f:
-        overlap_secrets = json.loads(f.read())
-        for key in overlap_secrets:
-            _secrets[key] = overlap_secrets[key]
+        try:
+            overlap_secrets = json.loads(f.read())
+            for key in overlap_secrets:
+                _secrets[key] = overlap_secrets[key]
+        except:
+            pass
 
 
 def get_secret(setting, secrets=_secrets):
