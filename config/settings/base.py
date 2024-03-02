@@ -53,7 +53,7 @@ try:
         SecretId=secret_name
     )
     _secrets = get_secret_value_response
-except ClientError as e:
+except:
     _secrets = dict()
 for key in _secrets:
     print("Secret read:", key)
