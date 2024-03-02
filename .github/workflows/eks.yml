@@ -83,11 +83,11 @@ jobs:
           key: ${{ runner.os }}-single-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-single-buildx
-      - name: Slack notification Buildx
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_TITLE: 'Deployment Buildx :ok_hand:'
-          SLACK_MESSAGE: "Everything looks good on Code project ${{github.repository}} :ok_hand: \n Begining the building and push \n Iniciated by ${{github.actor}}"
+      # - name: Slack notification Buildx
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_TITLE: 'Deployment Buildx :ok_hand:'
+      #     SLACK_MESSAGE: "Everything looks good on Code project ${{github.repository}} :ok_hand: \n Begining the building and push \n Iniciated by ${{github.actor}}"
       - name: Build & Push Image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
